@@ -3,7 +3,8 @@
  * the directory where node is running.
  */
 var posix = require('posix'),
-	sys = require('sys');
+	sys = require('sys'),
+    mime = require('mime');
 
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
 var LOG_LEVEL = DEBUG;
@@ -17,9 +18,10 @@ var baseDir = "./";
 require("http").createServer(function(req,resp) {
 	// don't allow ../ in paths
 	var file = req.uri.path.replace(/\.\.\//g,'').substring(1) || 'index.html';
-	// try to get the content type right for html at least...
-	var contentType = (/\.(.*?)$/.exec(file)||[])[1] == 'html' ? 
-		'text/html' : null;
+
+    var extention = (/(\..*?)$/.exec(file)||[])[1];
+    var content-type = mime.mime_type(extention, "text/plain");
+
 	log(DEBUG,"Got request for",file,contentType);
 	streamFile(baseDir + file,resp,contentType);
 }).listen(PORT);
@@ -28,7 +30,7 @@ log(INFO,"Server running on port",PORT);
 
 function streamFile(file,resp,contentType) {
     var die = setTimeout(finish,TIMEOUT);
-    posix.open(file,process.O_RDONLY,438).addCallback(function(fd) {
+    posix.open(file,process.O_RDONLY).addCallback(function(fd) {
 	    var position = 0;
 	    log(DEBUG,"opened",fd);
 	    if(fd) {
