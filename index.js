@@ -3,8 +3,7 @@
  * the directory where node is running.
  */
 var posix = require('posix'),
-	sys = require('sys'),
-    mime = require('mime');
+	sys = require('sys');
 
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
 var LOG_LEVEL = DEBUG;
@@ -19,7 +18,7 @@ require("http").createServer(function(req,resp) {
 	// don't allow ../ in paths
 	var file = req.uri.path.replace(/\.\.\//g,'').substring(1) || 'index.html';
 
-    var contentType = mime.mime_type(file, "text/plain");
+    var contentType = require("./mime").mime_type(file, "text/plain");
 
 	log(DEBUG,"Got request for",file,contentType);
 	streamFile(baseDir + file,resp,contentType);
