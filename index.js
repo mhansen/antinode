@@ -6,7 +6,7 @@ var posix = require('posix'),
 	sys = require('sys');
 
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
-var LOG_LEVEL = DEBUG;
+var LOG_LEVEL = INFO;
 
 // we never create a file, but posix.open requires us 
 // to specify permissions for creating a file anyway
@@ -25,7 +25,7 @@ require("http").createServer(function(req,resp) {
 
     var contentType = require("./mime").mime_type(file, "text/plain");
 
-	log(DEBUG,"Got request for",file,contentType);
+	log(INFO,"Got request for",file,contentType);
 	streamFile(baseDir + file,resp,contentType);
 }).listen(PORT);
 
