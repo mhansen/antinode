@@ -8,6 +8,10 @@ var posix = require('posix'),
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
 var LOG_LEVEL = DEBUG;
 
+// we never create a file, but posix.open requires us 
+// to specify permissions for creating a file anyway
+var FILE_PERMISSIONS = 0660; 
+
 var MAX_READ = 1024 * 1024 * 5; // 5MB - max bytes to request at a time
 var TIMEOUT = 1000 * 30; // 30 seconds
 var PORT = 8080;
@@ -16,7 +20,8 @@ var baseDir = "./";
 
 require("http").createServer(function(req,resp) {
 	// don't allow ../ in paths
-	var file = req.uri.path.replace(/\.\.\//g,'').substring(1) || 'index.html';
+    var uri = require('url').parse(req.url);
+	var file = uri.pathname.replace(/\.\.\//g,'').substring(1) || 'index.html';
 
     var contentType = require("./mime").mime_type(file, "text/plain");
 
@@ -28,7 +33,7 @@ log(INFO,"Server running on port",PORT);
 
 function streamFile(file,resp,contentType) {
     var die = setTimeout(finish,TIMEOUT);
-    posix.open(file,process.O_RDONLY).addCallback(function(fd) {
+    posix.open(file,process.O_RDONLY, FILE_PERMISSIONS).addCallback(function(fd) {
 	    var position = 0;
 	    log(DEBUG,"opened",fd);
 	    if(fd) {
