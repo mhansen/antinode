@@ -19,8 +19,7 @@ require("http").createServer(function(req,resp) {
 	// don't allow ../ in paths
 	var file = req.uri.path.replace(/\.\.\//g,'').substring(1) || 'index.html';
 
-    var extention = (/(\..*?)$/.exec(file)||[])[1];
-    var content-type = mime.mime_type(extention, "text/plain");
+    var contentType = mime.mime_type(file, "text/plain");
 
 	log(DEBUG,"Got request for",file,contentType);
 	streamFile(baseDir + file,resp,contentType);
