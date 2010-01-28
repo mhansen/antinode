@@ -6,13 +6,13 @@ var posix = require('posix'),
 	sys = require('sys');
 
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
-var LOG_LEVEL = INFO;
+var LOG_LEVEL = DEBUG;
 
 var MAX_READ = 1024 * 1024 * 5; // 5MB - max bytes to request at a time
 var TIMEOUT = 1000 * 30; // 30 seconds
-var PORT = 8080;
+var PORT = 80;
 
-var baseDir = "./";
+var baseDir = "/home/Moon/www/markhansen.co.nz/";
 
 require("http").createServer(function(req,resp) {
 	// don't allow ../ in paths
@@ -37,10 +37,10 @@ function streamFile(file,resp,contentType) {
 			resp.sendHeader(200,{"Content-Type":contentType || "text/plain"});
 			read();
 			function read() {
-			    posix.read(fd,MAX_READ,position).addCallback(function(data,bytes_read) {
+			    posix.read(fd,MAX_READ,position, "binary").addCallback(function(data,bytes_read) {
 				    log(DEBUG,"read",bytes_read,"bytes of",file);
 				    if(bytes_read > 0) {
-						resp.sendBody(data);
+						resp.sendBody(data, "binary");
 						position += bytes_read;
 						read(); // read more
 				    } else {				
