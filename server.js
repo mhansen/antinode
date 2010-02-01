@@ -9,44 +9,50 @@ var posix = require('posix'),
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
 var LOG_LEVEL = DEBUG;
 var VERSION = "0.1"
-var USER_AGENT = "Antinode/" + VERSION + " Node.js/" + process.version + " " +
-                 process.platform;
-
 var MAX_READ = 1024 * 1024 * 5; // 5MB - max bytes to request at a time
 var TIMEOUT = 1000 * 30; // 30 seconds
-
-var PORT = config.port || 8080;
-var baseDir = config.baseDir || ".";
+var PORT = config.port || 8080; //listen port
+var baseDir = config.baseDir || "./"; //web root
 
 require("http").createServer(function(req,resp) {
     log(INFO, "Got request for",req.url); 
     var pathname = require('url').parse(req.url).pathname || '/';
-	// don't allow .. in paths
-	var file = baseDir + pathname.replace(/\.\.\//g,'');
-    stream(file, resp);
+    function sanitize(path) {
+        return path.replace(/\.\.\//g,''); //don't allow access to parent dirs
+    }
+    stream(baseDir + sanitize(pathname), resp);
 }).listen(PORT);
 
 log(INFO,"Server running on port",PORT);
 log(INFO,"serving directory:",baseDir);
 
 
-function stream(file, resp) {
+function stream(path, resp) {
     var die = setTimeout(finish,TIMEOUT);
-
-    posix.stat(file).addCallback(function (stats) {
-        if (stats.isDirectory()) {
-            file += "/index.html";
+    function sendHeaders(httpstatus, contentType) {
+        resp.sendHeader(httpstatus, {
+                "Content-Type" : contentType || 
+                                 require("./content-type").mime_type(path) ||
+                                 "application/octet-stream",
+                "Server" : "Antinode/" + VERSION + 
+                           " Node.js/" + process.version + 
+                           " " + process.platform,
+                "Date" : (new Date()).toUTCString()
+            });
+    }
+    posix.stat(path).addCallback(function (stat) {
+        if (stat.isDirectory()) {
+            path += "/index.html";
         }
-        var contentType = require("./content-type").mime_type(file, "text/plain");
-        streamFile(file,resp,contentType);
+        streamFile(path,resp);
     }).addErrback(fileNotFound);
 
-    function streamFile(file, resp, contentType) {
+    function streamFile(file, resp) {
         posix.open(file,process.O_RDONLY, 0660).addCallback(function(fd) {
             var position = 0;
             log(DEBUG,"opened",fd);
             if(fd) {
-                sendHeaders(200,contentType || "text/plain");
+                sendHeaders(200);
                 read();
                 function read() {
                     posix.read(fd,MAX_READ,position, "binary").addCallback(function(data,bytes_read) {
@@ -68,7 +74,7 @@ function stream(file, resp) {
                 }
             } else {
                 log(WARN,"Invalid fd for file:",file);
-                sendHeader(500,"text/plain");			
+                sendHeader(500, "text/plain");
                 resp.sendBody(file);
                 resp.sendBody(" couldn't be opened.");
                 finish(fd);
@@ -76,18 +82,11 @@ function stream(file, resp) {
         }).addErrback(fileNotFound);
     }
     function fileNotFound() {
-        log(DEBUG,"404 opening",file,">",arguments);
+        log(DEBUG,"404 opening",path,">",arguments);
         sendHeaders(404,"text/plain");
-        resp.sendBody("*** Error opening "+file+
+        resp.sendBody("*** Error opening " + path +
                 ". Check the console for details. ***");
         finish();
-    }
-    function sendHeaders(httpstatus, contentType) {
-        resp.sendHeader(httpstatus, {
-                "Content-Type" : contentType,
-                "Server" : USER_AGENT,
-                "Date" : (new Date()).toUTCString()
-                });
     }
     function finish(fd) {	
 		resp.finish();
