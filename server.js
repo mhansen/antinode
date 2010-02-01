@@ -19,10 +19,17 @@ require("http").createServer(function(req,resp) {
     log(INFO, "Got request for",req.url); 
     var pathname = require('url').parse(req.url).pathname || '/';
 	// don't allow .. in paths
-	var file = pathname.replace(/\.\.\//g,'').substring(1) || 'index.html';
-
-    var contentType = require("./mime").mime_type(file, "text/plain");
-	streamFile(baseDir + file,resp,contentType);
+	var file = baseDir + pathname.replace(/\.\.\//g,'');
+    
+    posix.stat(file).addCallback(function (stats) {
+        if (stats.isDirectory()) file += "/index.html";
+        var contentType = require("./mime").mime_type(file, "text/plain");
+        streamFile(file,resp,contentType);
+    }).addErrback(function () {
+        log(ERROR, "Error stat'ing file", file, arguments);
+        resp.sendBody("*** Error reading from " + file + 
+            " Check the console for details. ***");
+    });
 }).listen(PORT);
 
 log(INFO,"Server running on port",PORT);
