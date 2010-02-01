@@ -1,6 +1,6 @@
 /**
- * Simple webserver with logging. Serves whatever files are reachable from
- * the directory where node is running.
+ * Simple webserver with logging. By default, serves whatever files are
+ * reachable from the directory where node is running.
  */
 var posix = require('posix'),
 	sys = require('sys'),
@@ -8,6 +8,7 @@ var posix = require('posix'),
 
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
 var LOG_LEVEL = DEBUG;
+var USER_AGENT = "0.1";
 
 var MAX_READ = 1024 * 1024 * 5; // 5MB - max bytes to request at a time
 var TIMEOUT = 1000 * 30; // 30 seconds
@@ -34,7 +35,7 @@ function stream(file, resp) {
         if (stats.isDirectory()) {
             file += "/index.html";
         }
-        var contentType = require("./mime").mime_type(file, "text/plain");
+        var contentType = require("./content-type").mime_type(file, "text/plain");
         streamFile(file,resp,contentType);
     }).addErrback(fileNotFound);
 
