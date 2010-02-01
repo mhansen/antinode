@@ -8,7 +8,9 @@ var posix = require('posix'),
 
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
 var LOG_LEVEL = DEBUG;
-var USER_AGENT = "0.1";
+var VERSION = "0.1"
+var USER_AGENT = "Antinode/" + VERSION + " Node.js/" + process.version + " " +
+                 process.platform;
 
 var MAX_READ = 1024 * 1024 * 5; // 5MB - max bytes to request at a time
 var TIMEOUT = 1000 * 30; // 30 seconds
@@ -44,8 +46,7 @@ function stream(file, resp) {
             var position = 0;
             log(DEBUG,"opened",fd);
             if(fd) {
-                log(DEBUG,"sendHeader 200");
-                resp.sendHeader(200,{"Content-Type":contentType || "text/plain"});
+                sendHeaders(200,contentType || "text/plain");
                 read();
                 function read() {
                     posix.read(fd,MAX_READ,position, "binary").addCallback(function(data,bytes_read) {
@@ -67,7 +68,7 @@ function stream(file, resp) {
                 }
             } else {
                 log(WARN,"Invalid fd for file:",file);
-                resp.sendHeader(500,{"Content-Type":"text/plain"});			
+                sendHeader(500,"text/plain");			
                 resp.sendBody(file);
                 resp.sendBody(" couldn't be opened.");
                 finish(fd);
@@ -76,10 +77,17 @@ function stream(file, resp) {
     }
     function fileNotFound() {
         log(DEBUG,"404 opening",file,">",arguments);
-        resp.sendHeader(404,{"Content-Type":"text/plain"});
+        sendHeaders(404,"text/plain");
         resp.sendBody("*** Error opening "+file+
                 ". Check the console for details. ***");
         finish();
+    }
+    function sendHeaders(httpstatus, contentType) {
+        resp.sendHeader(httpstatus, {
+                "Content-Type" : contentType,
+                "Server" : USER_AGENT,
+                "Date" : (new Date()).toUTCString()
+                });
     }
     function finish(fd) {	
 		resp.finish();
