@@ -3,29 +3,30 @@
  * the directory where node is running.
  */
 var posix = require('posix'),
-	sys = require('sys');
+	sys = require('sys'),
+    config = require('./config').settings;
 
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
 var LOG_LEVEL = DEBUG;
 
 var MAX_READ = 1024 * 1024 * 5; // 5MB - max bytes to request at a time
 var TIMEOUT = 1000 * 30; // 30 seconds
-var PORT = 80;
 
-var baseDir = "/home/Moon/www/markhansen.co.nz/";
+var PORT = config.port || 8080;
+var baseDir = config.baseDir || ".";
 
 require("http").createServer(function(req,resp) {
-	// don't allow ../ in paths
-    var uri = require('url').parse(req.url);
-	var file = uri.pathname.replace(/\.\.\//g,'').substring(1) || 'index.html';
+    log(INFO, "Got request for",req.url); 
+    var pathname = require('url').parse(req.url).pathname || '/';
+	// don't allow .. in paths
+	var file = pathname.replace(/\.\.\//g,'').substring(1) || 'index.html';
 
     var contentType = require("./mime").mime_type(file, "text/plain");
-
-	log(INFO,"Got request for",file,contentType);
 	streamFile(baseDir + file,resp,contentType);
 }).listen(PORT);
 
 log(INFO,"Server running on port",PORT);
+log(INFO,"serving directory:",baseDir);
 
 function streamFile(file,resp,contentType) {
     var die = setTimeout(finish,TIMEOUT);
