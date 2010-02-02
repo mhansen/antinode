@@ -1,5 +1,13 @@
 Antinode is a simple static file webserver built on node.js.
 
+# Usage
+
+Run it from the command line. 
+
+   $ node server.js
+
+If you want to bind to a port under 1024, you'll need to run node with special privileges.
+
 # Configuration
 
 Edit config.js to set up where to serve files from, and what port to listen on.
