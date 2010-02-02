@@ -29,30 +29,33 @@ log(INFO,"serving directory:",baseDir);
 
 function stream(path, resp) {
     var die = setTimeout(finish,TIMEOUT);
-    function sendHeaders(httpstatus, contentType) {
-        resp.sendHeader(httpstatus, {
-                "Content-Type" : contentType || 
-                                 require("./content-type").mime_type(path) ||
+    var size = 0;
+    function sendHeaders(httpstatus, content_length, content_type) {
+        resp.sendHeader(httpstatus, 
+            {   
+                "Content-Type" : content_type || 
                                  "application/octet-stream",
                 "Server" : "Antinode/" + VERSION + 
                            " Node.js/" + process.version + 
                            " " + process.platform,
-                "Date" : (new Date()).toUTCString()
+                "Date" : (new Date()).toUTCString(),
+                "Content-Length" : content_length
             });
     }
     posix.stat(path).addCallback(function (stat) {
         if (stat.isDirectory()) {
-            path += "/index.html";
+            stream(path + "/index.html", resp); //try dir/index.html
+        } else { 
+            streamFile(path, stat.size);
         }
-        streamFile(path);
     }).addErrback(fileNotFound);
 
-    function streamFile(file) {
+    function streamFile(file, filesize) {
         posix.open(file,process.O_RDONLY, 0660).addCallback(function(fd) {
             var position = 0;
             log(DEBUG,"opened",fd);
             if(fd) {
-                sendHeaders(200);
+                sendHeaders(200, filesize, require('./content-type').mime_type(path));
                 read();
                 function read() {
                     posix.read(fd,MAX_READ,position, "binary").addCallback(function(data,bytes_read) {
@@ -67,25 +70,24 @@ function stream(path, resp) {
                     }).addErrback(function() {
                         log(ERROR,"Error reading from",file,"position:",position,
                             ">",arguments);
-                        resp.sendBody("*** Error reading from "+file+
-                            ". Check the console for details. ***");
+                        resp.sendBody("Error reading from " + file);
                         finish(fd);
                     });
                 }
             } else {
                 log(WARN,"Invalid fd for file:",file);
-                sendHeader(500, "text/plain");
-                resp.sendBody(file);
-                resp.sendBody(" couldn't be opened.");
+                var body = file + " couldn't be opened.";
+                sendHeaders(500, body.length, "text/plain");
+                resp.sendBody(body);
                 finish(fd);
             }
         }).addErrback(fileNotFound);
     }
     function fileNotFound() {
         log(DEBUG,"404 opening",path,">",arguments);
-        sendHeaders(404,"text/plain");
-        resp.sendBody("*** Error opening " + path +
-                ". Check the console for details. ***");
+        var body = "404: " + path + " not found.";
+        sendHeaders(404,body.length,"text/plain");
+        resp.sendBody(body);
         finish();
     }
     function finish(fd) {	
