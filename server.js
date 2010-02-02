@@ -44,10 +44,10 @@ function stream(path, resp) {
         if (stat.isDirectory()) {
             path += "/index.html";
         }
-        streamFile(path,resp);
+        streamFile(path);
     }).addErrback(fileNotFound);
 
-    function streamFile(file, resp) {
+    function streamFile(file) {
         posix.open(file,process.O_RDONLY, 0660).addCallback(function(fd) {
             var position = 0;
             log(DEBUG,"opened",fd);
