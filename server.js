@@ -14,6 +14,9 @@ var TIMEOUT = 1000 * 30; // 30 seconds
 var PORT = config.port || 8080; //listen port
 var baseDir = config.baseDir || "./"; //web root
 
+log(INFO,"Creating server on port",PORT);
+log(INFO,"serving directory:",baseDir);
+
 require("http").createServer(function(req,resp) {
     log(INFO, "Got request for",req.url); 
     var pathname = require('url').parse(req.url).pathname || '/';
@@ -22,10 +25,6 @@ require("http").createServer(function(req,resp) {
     }
     stream(baseDir + sanitize(pathname), resp);
 }).listen(PORT);
-
-log(INFO,"Server running on port",PORT);
-log(INFO,"serving directory:",baseDir);
-
 
 function stream(path, resp) {
     var die = setTimeout(finish,TIMEOUT);

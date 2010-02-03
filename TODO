@@ -1,0 +1,2 @@
+Config.js should be in straight-up JSON
+Not having a config.js should give a warning on commandline and give sensible defaults
