@@ -102,6 +102,7 @@ function stream(path, resp) {
 
 /* Logging/Utility Functions */
 function log(level) {
+    sys.print((new Date()).toUTCString() + ": ");
     if(level >= LOG_LEVEL) sys.puts(join(slice(arguments,1)));
 }
 function slice(array,start) {
