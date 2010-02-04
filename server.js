@@ -2,28 +2,31 @@
  * Simple webserver with logging. By default, serves whatever files are
  * reachable from the directory where node is running.
  */
+var VERSION = "0.1"
 var posix = require('posix'),
 	sys = require('sys');
 
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
-var LOG_LEVEL = DEBUG;
-var VERSION = "0.1"
+var default_settings = {
+    "log_level": DEBUG,
+    "max_bytes_per_read": 1024 * 1024 * 5, // 5MB
+    "timeout_milliseconds": 1000 * 30, //30 sec
+    "port" : 8080,
+    "baseDir" : "./"
+}
 
-var MAX_READ = 1024 * 1024 * 5; // 5MB - max bytes to request at a time
-var TIMEOUT = 1000 * 30; // 30 seconds
-
-var settings = loadSettings();
 function loadSettings() {
-    var default_settings = { "port": 8080, "baseDir": "./" }
     try {
-        var s = JSON.parse(posix.cat("./settings.json").wait());
-        return process.mixin(default_settings, s);
+        var json = posix.cat("./settings.json").wait();
+        var file_settings = JSON.parse(json);
+        return process.mixin(default_settings, file_settings);
     } catch (e) { 
         log(WARN, "Error loading settings.json (",e,
                   ") Using default settings instead.");
         return default_settings;
     } 
 }
+var settings = loadSettings();
 
 log(INFO,"Creating server on port",settings.port);
 log(INFO,"serving directory:",settings.baseDir);
@@ -38,8 +41,7 @@ require("http").createServer(function(req,resp) {
 }).listen(settings.port);
 
 function stream(path, resp) {
-    var die = setTimeout(finish,TIMEOUT);
-    var size = 0;
+    var die = setTimeout(finish,settings.timeout_milliseconds);
     function sendHeaders(httpstatus, content_length, content_type) {
         resp.sendHeader(httpstatus, 
             {   
@@ -68,7 +70,8 @@ function stream(path, resp) {
                 sendHeaders(200, filesize, require('./content-type').mime_type(path));
                 read();
                 function read() {
-                    posix.read(fd,MAX_READ,position, "binary").addCallback(function(data,bytes_read) {
+                  posix.read(fd,settings.max_bytes_per_read,position, "binary")
+                    .addCallback(function(data,bytes_read) {
                         log(DEBUG,"read",bytes_read,"bytes of",file);
                         if(bytes_read > 0) {
                             resp.sendBody(data, "binary");
@@ -113,7 +116,7 @@ function stream(path, resp) {
 /* Logging/Utility Functions */
 function log(level) {
     sys.print((new Date()).toUTCString() + ": ");
-    if(level >= LOG_LEVEL) sys.puts(join(slice(arguments,1)));
+    if(level >= settings.log_level) sys.puts(join(slice(arguments,1)));
 }
 function slice(array,start) {
 	return Array.prototype.slice.call(array,start);
