@@ -1,2 +1,4 @@
-Config.js should be in straight-up JSON
-Not having a config.js should give a warning on commandline and give sensible defaults
+move logging code into own module
+add last-modified header
+create tests
+use path module for paths instead of string concatenation
