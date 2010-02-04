@@ -3,19 +3,30 @@
  * reachable from the directory where node is running.
  */
 var posix = require('posix'),
-	sys = require('sys'),
-    config = require('./config').settings;
+	sys = require('sys');
 
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
 var LOG_LEVEL = DEBUG;
 var VERSION = "0.1"
+
 var MAX_READ = 1024 * 1024 * 5; // 5MB - max bytes to request at a time
 var TIMEOUT = 1000 * 30; // 30 seconds
-var PORT = config.port || 8080; //listen port
-var baseDir = config.baseDir || "./"; //web root
 
-log(INFO,"Creating server on port",PORT);
-log(INFO,"serving directory:",baseDir);
+var settings = loadSettings();
+function loadSettings() {
+    var default_settings = { "port": 8080, "baseDir": "./" }
+    try {
+        var s = JSON.parse(posix.cat("./settings.json").wait());
+        return process.mixin(default_settings, s);
+    } catch (e) { 
+        log(WARN, "Error loading settings.json (",e,
+                  ") Using default settings instead.");
+        return default_settings;
+    } 
+}
+
+log(INFO,"Creating server on port",settings.port);
+log(INFO,"serving directory:",settings.baseDir);
 
 require("http").createServer(function(req,resp) {
     log(INFO, "Got request for",req.url); 
@@ -23,8 +34,8 @@ require("http").createServer(function(req,resp) {
     function sanitize(path) {
         return path.replace(/\.\.\//g,''); //don't allow access to parent dirs
     }
-    stream(baseDir + sanitize(pathname), resp);
-}).listen(PORT);
+    stream(settings.baseDir + sanitize(pathname), resp);
+}).listen(settings.port);
 
 function stream(path, resp) {
     var die = setTimeout(finish,TIMEOUT);
