@@ -4,7 +4,8 @@
  */
 var VERSION = "0.1"
 var posix = require('posix'),
-	sys = require('sys');
+	sys = require('sys'),
+    pathlib = require('path');
 
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
 var default_settings = {
@@ -33,11 +34,12 @@ log(INFO,"serving directory:",settings.baseDir);
 
 require("http").createServer(function(req,resp) {
     log(INFO, "Got request for",req.url); 
-    var pathname = require('url').parse(req.url).pathname || '/';
+    var url_path = require('url').parse(req.url).pathname || '/'; //TODO: return bad request status
     function sanitize(path) {
         return path.replace(/\.\.\//g,''); //don't allow access to parent dirs
     }
-    stream(settings.baseDir + sanitize(pathname), resp);
+    var path = pathlib.join(settings.baseDir, sanitize(url_path));
+    stream(path, resp);
 }).listen(settings.port);
 
 function stream(path, resp) {
@@ -56,7 +58,7 @@ function stream(path, resp) {
     }
     posix.stat(path).addCallback(function (stat) {
         if (stat.isDirectory()) {
-            stream(path + "/index.html", resp); //try dir/index.html
+            stream(pathlib.join(path, "index.html"), resp); //try dir/index.html
         } else { 
             streamFile(path, stat.size);
         }

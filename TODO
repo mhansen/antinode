@@ -1,4 +1,3 @@
 move logging code into own module
 add last-modified header
 create tests
-use path module for paths instead of string concatenation
