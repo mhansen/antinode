@@ -8,7 +8,7 @@ var posix = require('posix'),
     pathlib = require('path');
 
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
-var default_settings = {
+var settings = {
     "log_level": DEBUG,
     "max_bytes_per_read": 1024 * 1024 * 5, // 5MB
     "timeout_milliseconds": 1000 * 30, //30 sec
@@ -16,18 +16,12 @@ var default_settings = {
     "baseDir" : "./"
 }
 
-function loadSettings() {
-    try {
-        var json = posix.cat("./settings.json").wait();
-        var file_settings = JSON.parse(json);
-        return process.mixin(default_settings, file_settings);
-    } catch (e) { 
-        log(WARN, "Error loading settings.json (",e,
-                  ") Using default settings instead.");
-        return default_settings;
-    } 
+try {
+    var custom_settings = JSON.parse(posix.cat('./settings.json').wait());
+    process.mixin(settings, custom_settings);
+} catch(e) {
+    log(WARN, "Using default settings: cannot read settings.json.",e);
 }
-var settings = loadSettings();
 
 log(INFO,"Creating server on port",settings.port);
 log(INFO,"serving directory:",settings.baseDir);
