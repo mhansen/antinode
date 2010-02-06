@@ -61,7 +61,7 @@ function stream(path, resp) {
     function streamFile(file, filesize) {
         posix.open(file,process.O_RDONLY, 0660).addCallback(function(fd) {
             var position = 0;
-            log(DEBUG,"opened",fd);
+            log(DEBUG,"opened",path,"on fd",fd);
             if(fd) {
                 sendHeaders(200, filesize, require('./content-type').mime_type(path));
                 read();
@@ -101,10 +101,11 @@ function stream(path, resp) {
     }
     function finish(fd) {	
 		resp.finish();
-		log(DEBUG,"finished",fd);
-		clearTimeout(die);			
+		log(DEBUG,"finished request for",path);
+		clearTimeout(die);
 		if(fd) {
 		    posix.close(fd);
+            log(DEBUG,"closing fd",fd);
 		}
     }
 }
