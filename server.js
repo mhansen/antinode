@@ -31,6 +31,7 @@ require("http").createServer(function(req,resp) {
     var path = get_file_path(vhost.root, req.url);
     log(INFO,"Request:", JSON.stringify(req.headers));
     log(DEBUG, "Streaming", path);
+    resp.die = setTimeout(finish, settings.timeout_milliseconds);
     stream(path, resp);
 
     function get_vhost(hostname) {
@@ -45,7 +46,6 @@ require("http").createServer(function(req,resp) {
 }).listen(settings.port);
 
 function stream(path, resp) {
-    var die = setTimeout(finish,settings.timeout_milliseconds);
     function sendHeaders(httpstatus, content_length, content_type) {
         resp.sendHeader(httpstatus, 
             {   
@@ -82,13 +82,13 @@ function stream(path, resp) {
                             position += bytes_read;
                             read(); // read more
                         } else {				
-                            finish(fd);
+                            finish(resp,fd);
                         }
                     }).addErrback(function() {
                         log(ERROR,"Error reading from",file,"position:",position,
                             ">",arguments);
                         resp.sendBody("Error reading from " + file);
-                        finish(fd);
+                        finish(resp,fd);
                     });
                 }
             } else {
@@ -96,7 +96,7 @@ function stream(path, resp) {
                 var body = file + " couldn't be opened.";
                 sendHeaders(500, body.length, "text/plain");
                 resp.sendBody(body);
-                finish(fd);
+                finish(resp,fd);
             }
         }).addErrback(fileNotFound);
     }
@@ -105,16 +105,17 @@ function stream(path, resp) {
         var body = "404: " + path + " not found.";
         sendHeaders(404,body.length,"text/plain");
         resp.sendBody(body);
-        finish();
+        finish(resp);
     }
-    function finish(fd) {	
-		resp.finish();
-		log(DEBUG,"finished request for",path);
-		clearTimeout(die);
-		if(fd) {
-		    posix.close(fd);
-            log(DEBUG,"closing fd",fd);
-		}
+}
+
+function finish(resp, fd) {	
+    clearTimeout(resp.die);
+    resp.finish();
+    log(DEBUG,"finished request for",resp.url);
+    if(fd) {
+        posix.close(fd);
+        log(DEBUG,"closing fd",fd);
     }
 }
 
