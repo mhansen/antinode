@@ -1,4 +1,17 @@
 {
     "port" : 80,
-    "baseDir" : "/home/Moon/www/markhansen.co.nz/"
+
+    "hosts" : { 
+        "www.markhansen.co.nz" : {
+            "root" : "/home/Moon/www/markhansen.co.nz/"
+        },
+        "markhansen.co.nz" : {
+            "root" : "/home/Moon/www/markhansen.co.nz/"
+        }
+    },
+
+    "default_host" : {
+        "root" : "/home/Moon/www/default/"
+    }
+
 }

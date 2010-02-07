@@ -12,8 +12,11 @@ var default_settings = {
     "log_level": DEBUG,
     "max_bytes_per_read": 1024 * 1024 * 5, // 5MB
     "timeout_milliseconds": 1000 * 30, //30 sec
+    "hosts" : [],
     "port" : 8080,
-    "baseDir" : "./"
+    "default_host" : {
+        "root" : "./"
+    } 
 }
 
 function loadSettings() {
@@ -29,17 +32,22 @@ function loadSettings() {
 }
 var settings = loadSettings();
 
-log(INFO,"Creating server on port",settings.port);
-log(INFO,"serving directory:",settings.baseDir);
-
 require("http").createServer(function(req,resp) {
-    log(INFO, "Got request for",req.url); 
-    var url_path = require('url').parse(req.url).pathname || '/'; //TODO: return bad request status
-    function sanitize(path) {
-        return path.replace(/\.\.\//g,''); //don't allow access to parent dirs
-    }
-    var path = pathlib.join(settings.baseDir, sanitize(url_path));
+    var vhost = get_vhost(req.headers["host"]);
+    var path = get_file_path(vhost.root, req.url);
+    log(INFO,"Request:", JSON.stringify(req.headers));
+    log(DEBUG, "Streaming", path);
     stream(path, resp);
+
+    function get_vhost(hostname) {
+        return settings.hosts[hostname] || settings.default_host;
+    }
+
+    function get_file_path(webroot, url) {
+        var path = require('url').parse(url).pathname || '/';
+        path = path.replace(/\.\.\//g,''); //don't allow access to parent dirs
+        return pathlib.join(webroot, path);
+    }
 }).listen(settings.port);
 
 function stream(path, resp) {
