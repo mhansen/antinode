@@ -5,7 +5,9 @@
 var VERSION = "0.1"
 var posix = require('posix'),
 	sys = require('sys'),
-    pathlib = require('path');
+    pathlib = require('path'),
+    uri = require('url')
+    mime = require('./content-type');
 
 var DEBUG = 0, INFO = 1, WARN = 2, ERROR = 3;
 var settings = {
@@ -39,11 +41,12 @@ require("http").createServer(function(req,resp) {
     }
 
     function get_file_path(webroot, url) {
-        var path = require('url').parse(url).pathname || '/';
+        var path = uri.parse(url || '/').pathname;
         path = path.replace(/\.\.\//g,''); //don't allow access to parent dirs
         return pathlib.join(webroot, path);
     }
 }).listen(settings.port);
+
 
 function stream(path, resp) {
     function sendHeaders(httpstatus, content_length, content_type) {
@@ -71,7 +74,7 @@ function stream(path, resp) {
             var position = 0;
             log(DEBUG,"opened",path,"on fd",fd);
             if(fd) {
-                sendHeaders(200, filesize, require('./content-type').mime_type(path));
+                sendHeaders(200, filesize, mime.mime_type(path));
                 read();
                 function read() {
                   posix.read(fd,settings.max_bytes_per_read,position, "binary")
