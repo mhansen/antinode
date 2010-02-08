@@ -22,16 +22,18 @@ var settings = {
 }
 
 try {
+    log(DEBUG, "Reading/parsing settings.json");
     var custom_settings = JSON.parse(posix.cat('./settings.json').wait());
     process.mixin(settings, custom_settings);
 } catch(e) {
     log(WARN, "Using default settings: cannot read settings.json.",e);
 }
 
+log(INFO, "Starting server on port", settings.port);
 require("http").createServer(function(req,resp) {
+    log(INFO,"Request:", JSON.stringify(req.headers));
     var vhost = get_vhost(req.headers["host"]);
     var path = get_file_path(vhost.root, req.url);
-    log(INFO,"Request:", JSON.stringify(req.headers));
     log(DEBUG, "Streaming", path);
     resp.die = setTimeout(finish, settings.timeout_milliseconds);
     stream(path, resp);
