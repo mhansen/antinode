@@ -1,8 +1,10 @@
 var sys = require('sys');
 
-function log() {
-    sys.print((new Date()).toUTCString() + ": ");
-    sys.puts(join(arguments));
+function log(level, args) {
+    if (level >= exports.level) { 
+        sys.print((new Date()).toUTCString() + ": ");
+        sys.puts(join(args));
+    }
 }
 
 exports.levels = levels = { 
@@ -15,24 +17,16 @@ exports.levels = levels = {
 exports.level = levels.warn;
 
 exports.debug = function() {
-    if (exports.level <= levels.DEBUG) {
-        log(arguments);
-    }
+    log(levels.DEBUG, arguments);
 }
 exports.warn = function() {
-    if (exports.level <= levels.WARN) {
-        log(arguments);
-    }
+    log(levels.WARN, arguments);
 }
 exports.info = function() {
-    if (exports.level <= levels.INFO) {
-        log(arguments);
-    }
+    log(levels.INFO, arguments);
 }
 exports.error = function() {
-    if (exports.level <= levels.ERROR) {
-        log(arguments);
-    }
+    log(levels.ERROR, arguments);
 }
 
 /* Utility functions */
