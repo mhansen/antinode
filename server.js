@@ -23,7 +23,7 @@ var settings = {
 
 try {
     log.debug("Reading/parsing settings.json");
-    var custom_settings = JSON.parse(fs.cat('./settings.json').wait());
+    var custom_settings = JSON.parse(fs.catSync('./settings.json'));
     process.mixin(settings, custom_settings);
 } catch(e) {
     log.warn("Using default settings: cannot read settings.json.",e);
