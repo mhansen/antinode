@@ -6,8 +6,8 @@ var VERSION = "0.1"
 var posix = require('posix'),
     pathlib = require('path'),
     uri = require('url')
-    mime = require('./content-type'),
-    log = require('./log');
+    mime = require('./lib/content-type'),
+    log = require('./lib/log');
 
 log.level = log.levels.DEBUG;
 
