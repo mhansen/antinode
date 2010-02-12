@@ -3,7 +3,7 @@
  * reachable from the directory where node is running.
  */
 var VERSION = "0.1"
-var posix = require('posix'),
+var fs = require('fs'),
     pathlib = require('path'),
     uri = require('url')
     mime = require('./lib/content-type'),
@@ -23,7 +23,7 @@ var settings = {
 
 try {
     log.debug("Reading/parsing settings.json");
-    var custom_settings = JSON.parse(posix.cat('./settings.json').wait());
+    var custom_settings = JSON.parse(fs.cat('./settings.json').wait());
     process.mixin(settings, custom_settings);
 } catch(e) {
     log.warn("Using default settings: cannot read settings.json.",e);
@@ -63,7 +63,7 @@ function stream(path, resp) {
                 "Content-Length" : content_length
             });
     }
-    posix.stat(path).addCallback(function (stat) {
+    fs.stat(path).addCallback(function (stat) {
         if (stat.isDirectory()) {
             stream(pathlib.join(path, "index.html"), resp); //try dir/index.html
         } else { 
@@ -72,14 +72,14 @@ function stream(path, resp) {
     }).addErrback(fileNotFound);
 
     function streamFile(file, filesize) {
-        posix.open(file,process.O_RDONLY, 0660).addCallback(function(fd) {
+        fs.open(file,process.O_RDONLY, 0660).addCallback(function(fd) {
             var position = 0;
             log.debug("opened",path,"on fd",fd);
             if(fd) {
                 sendHeaders(200, filesize, mime.mime_type(path));
                 read();
                 function read() {
-                  posix.read(fd,settings.max_bytes_per_read,position, "binary")
+                  fs.read(fd,settings.max_bytes_per_read,position, "binary")
                     .addCallback(function(data,bytes_read) {
                         log.debug("read",bytes_read,"bytes of",file);
                         if(bytes_read > 0) {
@@ -119,7 +119,7 @@ function finish(resp, fd) {
     resp.finish();
     log.debug("finished request for",resp.url);
     if(fd) {
-        posix.close(fd);
+        fs.close(fd);
         log.debug("closing fd",fd);
     }
 }
