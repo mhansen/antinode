@@ -51,32 +51,32 @@ require("http").createServer(function(req,resp) {
 
 
 function stream(path, resp) {
-    function sendHeaders(httpstatus, content_length, content_type) {
-        resp.sendHeader(httpstatus, 
-            {   
-                "Content-Type" : content_type || 
-                                 "application/octet-stream",
-                "Server" : "Antinode/" + VERSION + 
-                           " Node.js/" + process.version + 
-                           " " + process.platform,
-                "Date" : (new Date()).toUTCString(),
-                "Content-Length" : content_length
-            });
+    function sendHeaders(httpstatus, length, content_type, modified_time) {
+        var headers = {   
+            "Content-Type" : content_type || "application/octet-stream",
+            "Server" : "Antinode/"+VERSION+" Node.js/"+process.version,
+            "Date" : (new Date()).toUTCString(),
+            "Content-Length" : length
+        };
+        if (modified_time) { 
+            headers["Last-Modified"] = modified_time.toUTCString(); 
+        }
+        resp.sendHeader(200, headers);
     }
     fs.stat(path).addCallback(function (stat) {
         if (stat.isDirectory()) {
             stream(pathlib.join(path, "index.html"), resp); //try dir/index.html
         } else { 
-            streamFile(path, stat.size);
+            streamFile(path, stat.size, stat.mtime);
         }
     }).addErrback(fileNotFound);
 
-    function streamFile(file, filesize) {
+    function streamFile(file, filesize, last_modified) {
         fs.open(file,process.O_RDONLY, 0660).addCallback(function(fd) {
             var position = 0;
             log.debug("opened",path,"on fd",fd);
             if(fd) {
-                sendHeaders(200, filesize, mime.mime_type(path));
+                sendHeaders(200, filesize, mime.mime_type(path), last_modified);
                 read();
                 function read() {
                   fs.read(fd,settings.max_bytes_per_read,position, "binary")

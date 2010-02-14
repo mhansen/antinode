@@ -56,6 +56,7 @@ E.g. an HTTP request for `/styles/site.css` will will look for the file `/var/ww
 - HTTP `Content-Type` header detection from file extension
 - HTTP `Content-Length` header support
 - HTTP `Date` header
+- HTTP `Last-Modified` header
 - Reads files in binary mode - so can serve images and other binary files (not just text)
 - Requests to any `directory` try to return `directory/index.html`
 - Virtual Hosts
