@@ -31,7 +31,8 @@ try {
 
 log.info( "Starting server on port", settings.port);
 require("http").createServer(function(req,resp) {
-    log.info("Request:", JSON.stringify(req.headers));
+    log.info("Request from ",req.connection.remoteAddress);
+    log.info(JSON.stringify(req.headers));
     var vhost = get_vhost(req.headers["host"]);
     var path = get_file_path(vhost.root, req.url);
     log.debug( "Streaming", path);
