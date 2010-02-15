@@ -44,7 +44,8 @@ require("http").createServer(function(req,resp) {
 }).listen(settings.port);
 
 function resolve_file_path(req, callback) {
-    var vhost = settings.hosts[req.host] || settings.default_host;
+    var vhost = settings.hosts[req.headers.host] || settings.default_host;
+    log.debug("selected vhost",vhost.root);
     //disallow parent directory access
     var clean_path = uri.parse(req.url || '/').pathname.replace(/\.\.\//g);
     var path = pathlib.join(vhost.root, clean_path);
