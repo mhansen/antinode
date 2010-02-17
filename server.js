@@ -38,12 +38,13 @@ require("http").createServer(function(req,resp) {
         finish(resp); 
     }, settings.timeout_milliseconds);
 
-    resolve_file_path(req).addListener('success', function(path) {
+    find_local_file_path(req).addListener('success', function(path) {
         try_stream(path, resp);
     });
 }).listen(settings.port);
 
-function resolve_file_path(req, callback) {
+
+function find_local_file_path(req) {
     var vhost = settings.hosts[req.headers.host] || settings.default_host;
     log.debug("selected vhost",vhost.root);
     //disallow parent directory access
