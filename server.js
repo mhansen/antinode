@@ -24,7 +24,7 @@ var settings = {
 
 try {
     log.debug("Reading/parsing settings.json");
-    var custom_settings = JSON.parse(fs.catSync('./settings.json'));
+    var custom_settings = JSON.parse(fs.readFileSync('./settings.json'));
     process.mixin(settings, custom_settings);
 } catch(e) {
     log.warn("Using default settings: cannot read settings.json.",e);
@@ -85,7 +85,7 @@ function try_stream(path, resp) {
         }
     }).addErrback(file_not_found);
     function stream_file(file, stats) {
-        fs.open(file,process.O_RDONLY, 0660).addCallback(function(fd) {
+        fs.open(file,'r', 0660).addCallback(function(fd) {
             var position = 0;
             log.debug("opened",path,"on fd",fd);
             function read() {
@@ -93,7 +93,7 @@ function try_stream(path, resp) {
                 .addCallback(function(data,bytes_read) {
                     log.debug("read",bytes_read,"bytes of",file);
                     if(bytes_read > 0) {
-                        resp.sendBody(data, "binary");
+                        resp.write(data, "binary");
                         position += bytes_read;
                         read(); // read more
                     } else {
@@ -103,7 +103,7 @@ function try_stream(path, resp) {
                 }).addErrback(function() {
                     log.error("Error reading from",file,"position:",position,
                         ">",arguments);
-                    resp.sendBody("Error reading from " + file);
+                    resp.write("Error reading from " + file);
                     finish(resp);
                     close(fd);
                 });
@@ -122,14 +122,14 @@ function try_stream(path, resp) {
         log.debug("404 opening",path,">",arguments);
         var body = "404: " + path + " not found.";
         send_headers(404,body.length,"text/plain");
-        resp.sendBody(body);
+        resp.write(body);
         finish(resp);
     }
 
     function server_error(message) {
         log.error("error opening ",path,":",message);
         send_headers(500, message.length, "text/plain");
-        resp.sendBody(message);
+        resp.write(message);
         finish(resp);
     }
 }
