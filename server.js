@@ -48,8 +48,8 @@ function find_local_file_path(req) {
     var url = uri.parse(req.url);
     //if the parsed url doesn't have a pathname, default to '/'
     var pathname = (url.pathname || '/');
-    //disallow parent directory access
-    var clean_pathname = pathname.replace(/\.\.\//g);
+    //disallow parent directory access, convert spaces
+    var clean_pathname = pathname.replace(/\.\.\//g,'').replace(/\%20/g,' ');
     var vhost = settings.hosts[req.headers.host] || settings.default_host;
     log.debug("selected vhost",vhost.root);
     var path = pathlib.join(vhost.root, clean_pathname);
@@ -60,7 +60,7 @@ function find_local_file_path(req) {
         }
         emitter.emit('success', path);
     }).addErrback(function () {
-        emitter.emit('success', path);
+        emitter.emit('success', path); //continue with program, will 404 later
     });
     return emitter;
 }
