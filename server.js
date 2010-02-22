@@ -45,12 +45,14 @@ require("http").createServer(function(req,resp) {
 
 
 function find_local_file_path(req) {
+    var url = uri.parse(req.url);
+    //if the parsed url doesn't have a pathname, default to '/'
+    var pathname = (url.pathname || '/');
+    //disallow parent directory access
+    var clean_pathname = pathname.replace(/\.\.\//g);
     var vhost = settings.hosts[req.headers.host] || settings.default_host;
     log.debug("selected vhost",vhost.root);
-    //disallow parent directory access
-    var clean_path = uri.parse(req.url || '/').pathname.replace(/\.\.\//g);
-    var path = pathlib.join(vhost.root, clean_path);
-
+    var path = pathlib.join(vhost.root, clean_pathname);
     var emitter = new events.EventEmitter();
     fs.stat(path).addCallback(function (stat) {
         if (stat.isDirectory()) {
