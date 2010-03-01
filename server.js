@@ -5,11 +5,19 @@
 var fs = require('fs'),
     antinode = require('./lib/antinode');
 
-var settings;
-try {
-    var custom_settings = JSON.parse(fs.readFileSync('./settings.json'));
+fs.readFile('./settings.json', function(err, data) {
+    var settings, custom_settings;
+    if (err) {
+        sys.puts('No settings.json found. Using default settings');
+        antinode.start(antinode.default_settings);
+        process.exit(0);
+    }
+    try {
+        custom_settings = JSON.parse(data);
+    } catch (e) {
+        sys.puts('Error parsing settings.json');
+        process.exit(1);
+    }
     settings = process.mixin(antinode.default_settings, custom_settings);
-} catch(e) {
-    settings = antinode.default_settings;
-}
-antinode.start(settings);
+    antinode.start(settings);
+});
