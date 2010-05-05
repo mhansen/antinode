@@ -7,6 +7,9 @@
         },
         "markhansen.co.nz" : {
             "root" : "/home/Moon/www/markhansen.co.nz/"
+        },
+        "staging.markhansen.co.nz" : {
+            "root" : "/home/Moon/www/staging.markhansen.co.nz/"
         }
     },
 
