@@ -3,7 +3,7 @@
  * reachable from the directory where node is running.
  */
 var fs = require('fs'),
-    antinode = require('./lib/antinode');
+antinode = require('./lib/antinode');
 
 fs.readFile('./settings.json', function(err, data) {
     var settings, custom_settings;
@@ -18,6 +18,13 @@ fs.readFile('./settings.json', function(err, data) {
         sys.puts('Error parsing settings.json');
         process.exit(1);
     }
-    settings = process.mixin(antinode.default_settings, custom_settings);
+    settings = mixin(antinode.default_settings, custom_settings);
     antinode.start(settings);
 });
+
+function mixin(base, extension) {
+    var out = {};
+    for (var key in base) out[key] = base[key];
+    for (var key in extension) out[key] = extension[key];
+    return out;
+}
