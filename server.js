@@ -3,7 +3,8 @@
  * reachable from the directory where node is running.
  */
 var fs = require('fs'),
-antinode = require('./lib/antinode');
+antinode = require('./lib/antinode'),
+sys = require('sys');
 
 fs.readFile('./settings.json', function(err, data) {
     var settings = {};
@@ -11,9 +12,9 @@ fs.readFile('./settings.json', function(err, data) {
         sys.puts('No settings.json found. Using default settings');
     }
     try {
-        settings = JSON.parse(data);
+        settings = JSON.parse(data.toString('utf8',0,data.length));
     } catch (e) {
-        sys.puts('Error parsing settings.json');
+        sys.puts('Error parsing settings.json: '+e);
         process.exit(1);
     }
     settings.__proto__ = antinode.default_settings;
