@@ -4,15 +4,15 @@ Antinode is a simple static file webserver built on node.js.
 
 Run it from the command line. 
 
-   $ node server.js
+   $ node server.js [settings.json]
 
 If you want to bind to a port under 1024, you'll need to run node with special
 privileges.
 
 # Configuration
 
-Configuration is through `settings.json`, a JSON text file in the same folder
-as `server.js`.
+Configuration is through a JSON text file, by default the `settings.json` in
+the same folder as `server.js`.
 
 Example settings file:
 
