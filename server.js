@@ -17,6 +17,5 @@ fs.readFile(process.argv[2] || './settings.json', function(err, data) {
         sys.puts('Error parsing settings.json: '+e);
         process.exit(1);
     }
-    settings.__proto__ = antinode.default_settings;
     antinode.start(settings);
 });
