@@ -12,10 +12,10 @@ var settings = {
     "port": PORT, 
     "default_host" : {
         "root": path.join(fixturesDir,"default-host")
-    }
+    },
+    "log_level": 4 //silent
 }
-antinode.start(settings);
-setTimeout(function() {
+antinode.start(settings, function() {
     var client = http.createClient(PORT, 'localhost');
     var request = client.request('GET', '/'+file);
     request.addListener('response', function (response) {
@@ -24,7 +24,8 @@ setTimeout(function() {
         response.addListener('data', function (chunk) {
             assert.equal(chunk, fileText);
             puts("OK");
+            antinode.stop();
         });
     });
     request.end();
-}, 1000);
+});
