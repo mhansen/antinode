@@ -15,7 +15,7 @@ exports.settings = {
     "default_host" : {
         "root": path.join(fixturesDir,"default-host")
     },
-    "log_level": 4 //silent
+    "log_level": 1 //silent
 }
 
 var sys = require("sys");
