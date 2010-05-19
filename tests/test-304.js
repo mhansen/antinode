@@ -71,9 +71,11 @@ change_mtime(function() {
  * the closure loop variable problem. */
 function createFunc(test) {
     return function(response) {
-        debug("got "+response.statusCode+" expecting "+test.status);
         assert.equal(response.statusCode, test.status);
         responses++;
-        if (responses >= tests.length) antinode.stop();
+        if (responses >= tests.length) {
+            antinode.stop();
+            puts("304 Test OK");
+        }
     }
 }
