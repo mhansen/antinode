@@ -1,14 +1,8 @@
 require('./common');
 
-var filename = "doesntexist.html";
-
 antinode.start(settings, function() {
-    var client = http.createClient(settings.port, 'localhost');
-    var request = client.request('GET', '/'+filename);
-    request.addListener('response', function (response) {
-        assert.equal(response.statusCode, 404);
+    test_get('/doesntexist.html', 404, null, function() {
         puts("Got 404 OK");
         antinode.stop();
     });
-    request.end();
 });
