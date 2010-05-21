@@ -1,12 +1,5 @@
 Antinode is a simple static file webserver built on node.js.
 
-# Checking out
-
-When cloning the repository, remember to run:
-
-    git submodule init
-    git submodule update
-
 # Usage
 
 Run it from the command line. 
