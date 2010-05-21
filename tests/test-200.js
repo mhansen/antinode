@@ -1,20 +1,17 @@
 require('./common');
 
 var files = ["smalltext", "dictionary", "cat.jpg"];
-var fileTexts = _.map(files, function (file) {
-    var filename = path.join(settings.default_host.root, file);
-    return fs.readFileSync(filename, 'binary');
-});
 
-antinode.start(settings, function() {
-    var finishedFiles = 0;
-    for (var i=0; i<files.length; i++) {
-        test_get('/'+files[i], 200, fileTexts[i], function() {
-            finishedFiles++;
-            if (finishedFiles >= files.length) {
+files.forEach(function (file) {
+    var disc_filename = path.join(settings.default_host.root, file);
+    var fileText = fs.readFileSync(disc_filename, 'binary');
+
+    exports[file] = function(test) {
+        antinode.start(settings, function() {
+            test_get(test,'/'+file, 200, fileText, function() {
                 antinode.stop();
-                puts("Passed: 200 Test");
-            }
+                test.done();
+            });
         });
     }
 });

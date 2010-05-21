@@ -61,6 +61,13 @@ E.g. an HTTP request for `/styles/site.css` will will look for the file `/var/ww
 - Requests to any `directory` try to return `directory/index.html`
 - Virtual Hosts
 
+# Test Suite
+
+
+To run the tests:
+
+    $ node runtests.js
+
 # Credits
 
 Original code forked from [Noah Sloan](http://github.com/iamnoah)'s [simple logging webserver](http://gist.github.com/246761).

@@ -5,14 +5,14 @@ var file = "304test";
 var mtime = "2000-01-01T12:00:00"; //aribtrary
 
 var file_path = path.join(settings.default_host.root, file);
-function change_mtime(callback) {
+function change_mtime(test, callback) {
     // Node doesn't have a utime() call to change mtime.
     // We delegate this task to the trusty `touch`
     var command = 'touch '+file_path+' -m -d "'+mtime+'"';
     var child = exec(command, function (err, stdout, stderr) {
         if (err) throw err;
-        assert.equal(stdout, "");
-        assert.equal(stderr, "");
+        test.equals(stdout, "");
+        test.equals(stderr, "");
         callback();
     });
 }
@@ -52,30 +52,23 @@ var tests = [
 },
 ]
 
-var responses = 0;
-change_mtime(function() {
-    antinode.start(settings, function() {
-        var client = http.createClient(settings.port, 'localhost');
-        for (var i=0;i<tests.length;i++) {
-            var test = tests[i];
-            var request = client.request('GET', '/'+file, {
-                'if-modified-since': test.date 
-            });
-            request.addListener('response', createFunc(test));
-            request.end();
-        };
-    });
-});
+tests.forEach(function (testCase) {
+    exports[testCase.description] = function(test) {
+        antinode.start(settings, function() {
+            change_mtime(test, runtest);
+        });
 
-/* Create a new function each time through the loop to avoid 
- * the closure loop variable problem. */
-function createFunc(test) {
-    return function(response) {
-        assert.equal(response.statusCode, test.status);
-        responses++;
-        if (responses >= tests.length) {
-            antinode.stop();
-            puts("304 Test OK");
+        function runtest() {
+            var client = http.createClient(settings.port, 'localhost');
+            var request = client.request('GET', '/'+file, {
+                'If-Modified-Since': testCase.date 
+            });
+            request.addListener('response', function(response) {
+                test.equals(response.statusCode, testCase.status);
+                antinode.stop();
+                test.done();
+            });
+            request.end();
         }
     }
-}
+});

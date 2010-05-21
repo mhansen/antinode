@@ -1,8 +1,11 @@
 require('./common');
 
-antinode.start(settings, function() {
-    test_get('/doesntexist.html', 404, null, function() {
-        puts("Got 404 OK");
-        antinode.stop();
+var file = "/doesntexist.html";
+exports[file] = function (test) {
+    antinode.start(settings, function() {
+        test_get(test,file, 404, null, function() {
+            antinode.stop();
+            test.done();
+        });
     });
-});
+}
