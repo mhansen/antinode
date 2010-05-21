@@ -14,7 +14,7 @@ exports.settings = {
     "default_host" : {
         "root": path.join(fixturesDir,"default-host")
     },
-    "log_level": 3 // debug/loud
+    "log_level": antinode.log_levels.ERROR
 }
 
 var sys = require("sys");
