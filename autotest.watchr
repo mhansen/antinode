@@ -17,19 +17,3 @@ end
 
 run_all_tests
 watch("(tests|lib)(/.*)+.js") { |m| run_all_tests }
-
-@interrupted = false
-
-# Ctrl-C
-Signal.trap "INT" do
-  if @interrupted
-    abort("\n")
-  else
-    puts "Interrupt a second time to quit"
-    @interrupted = true
-    Kernel.sleep 1.5
-
-    run_all_tests
-    @interrupted = false
-  end
-end
