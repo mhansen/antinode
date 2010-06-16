@@ -8,4 +8,4 @@ exports[file] = function (test) {
             test.done();
         });
     });
-}
+};

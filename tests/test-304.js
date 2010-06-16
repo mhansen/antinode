@@ -49,8 +49,8 @@ var tests = [
     "date":'Fri, 29 Oct 2004 08:43:31 GMT',
     "status": 304
 
-},
-]
+}
+];
 
 tests.forEach(function (testCase) {
     exports[testCase.description] = function(test) {
@@ -70,5 +70,5 @@ tests.forEach(function (testCase) {
             });
             request.end();
         }
-    }
+    };
 });

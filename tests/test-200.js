@@ -13,5 +13,5 @@ files.forEach(function (file) {
                 test.done();
             });
         });
-    }
+    };
 });

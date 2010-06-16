@@ -15,7 +15,7 @@ exports.settings = {
         "root": path.join(fixturesDir,"default-host")
     },
     "log_level": antinode.log_levels.ERROR
-}
+};
 
 var sys = require("sys");
 for (var i in sys) exports[i] = sys[i];
@@ -40,4 +40,5 @@ exports.test_get = function(test, pathname, expected_code, expected_body, callba
         });
     });
     request.end();
-}
+};
+

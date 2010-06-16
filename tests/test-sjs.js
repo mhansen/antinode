@@ -10,5 +10,5 @@ cases.forEach(function (testcase) {
                 test.done();
             });
         });
-    }
+    };
 });

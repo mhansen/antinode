@@ -10,7 +10,7 @@ exports["GET /folder -> /folder/index.html"] = function(test) {
             test.done();
         });
     });
-}
+};
 exports["GET /folder/ -> /folder/index.html"] = function(test) {
     antinode.start(settings, function() {
         test_get(test,'/folder/', 200, indexText, function() { 
@@ -18,4 +18,4 @@ exports["GET /folder/ -> /folder/index.html"] = function(test) {
             test.done();
         });
     });
-}
+};
