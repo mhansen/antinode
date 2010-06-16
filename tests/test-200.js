@@ -8,7 +8,10 @@ files.forEach(function (file) {
 
     exports[file] = function(test) {
         antinode.start(settings, function() {
-            test_get(test,'/'+file, 200, fileText, function() {
+            test_http(test,
+                      {'method':'GET','pathname':'/'+file},
+                      {'statusCode':200,'body':fileText},
+            function() {
                 antinode.stop();
                 test.done();
             });

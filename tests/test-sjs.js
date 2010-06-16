@@ -1,14 +1,24 @@
 require('./common');
 
-var cases = [ { "file": "hello.sjs", "expected": "hello world" } ];
+var cases = [ { "file": "hello.sjs", "expectedBody": "hello world" } ];
 
 cases.forEach(function (testcase) {
     exports[testcase.file] = function(test) {
         antinode.start(settings, function() {
-            test_get(test,'/'+testcase.file, 200, testcase.expected, function() {
-                antinode.stop();
-                test.done();
-            });
+            test_http(test,
+                {
+                    'method':'GET',
+                    'pathname': '/'+testcase.file
+                },
+                {
+                    'statusCode':200, 
+                    'body':testcase.expectedBody,
+                },
+                function() {
+                    antinode.stop();
+                    test.done();
+                }
+            );
         });
     };
 });

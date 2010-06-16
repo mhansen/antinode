@@ -59,16 +59,18 @@ tests.forEach(function (testCase) {
         });
 
         function runtest() {
-            var client = http.createClient(settings.port, 'localhost');
-            var request = client.request('GET', '/'+file, {
-                'If-Modified-Since': testCase.date 
-            });
-            request.addListener('response', function(response) {
-                test.equals(response.statusCode, testCase.status);
-                antinode.stop();
-                test.done();
-            });
-            request.end();
+            test_http(test, 
+                {
+                    'method':'GET',
+                    'pathname':'/'+file,
+                    'headers':{ 'If-Modified-Since': testCase.date }
+                },
+                { 'statusCode':testCase.status },
+                function () {
+                    antinode.stop();
+                    test.done();
+                }
+            );
         }
     };
 });
