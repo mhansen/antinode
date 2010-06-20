@@ -1,6 +1,6 @@
 { "name" : "antinode"
 , "description" : "A simple web server for node.js"
-, "version" : "2.0.5"
+, "version" : "2.0.6"
 , "author" : "Mark Hansen <mark@markhansen.co.nz>"
 , "contributors" :
   [ "Ben Noordhuis <info@bnoordhuis.nl>"
