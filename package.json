@@ -1,0 +1,28 @@
+{ "name" : "antinode"
+, "description" : "A simple web server for node.js"
+, "version" : "2.0.1"
+, "author" : "Mark Hansen <mark@markhansen.co.nz>"
+, "contributors" :
+  [ "Ben Noordhuis <info@bnoordhuis.nl>"
+  , "Hans Huebner <hans.huebner@gmail.com>"
+  , "Noah Sloan <iamnoah@gmail.com>"
+  ]
+, "repository" :
+  { "type" : "git"
+  , "url" : "http://github.com/mhansen/antinode.git"
+  }
+, "bugs" :
+  { "mail" : "mark@markhansen.co.nz"
+  , "web" : "http://github.com/mhansen/antinode/issues"
+  }
+, "os" : [ "linux", "darwin", "freebsd" ]
+, "directories" : { "lib" : "./lib/" }
+, "main" : "./lib/antinode"
+, "bin" : { "antinode" : "./server.js" }
+, "engines" : { "node" : ">=0.1.98" }
+, "licenses" :
+  [ { "type" : "MIT"
+    , "url" : "http://github.com/mhansen/antinode/raw/master/LICENSE"
+    }
+  ]
+}

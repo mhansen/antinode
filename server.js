@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * Simple webserver with logging. By default, serves whatever files are
  * reachable from the directory where node is running.
