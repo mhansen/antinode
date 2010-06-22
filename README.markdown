@@ -6,6 +6,7 @@ Run it from the command line.
 
    $ node server.js [settings.json]
 
+Requires Node.JS v0.1.97 or greater.
 If you want to bind to a port under 1024, you'll need to run node with special
 privileges.
 
