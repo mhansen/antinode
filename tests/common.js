@@ -16,6 +16,9 @@ exports.settings = {
     "hosts" : {
         "examplevirtualhost.com" : {
             "root" : path.join(fixturesDir,"examplevirtualhost.com")
+        },
+        "scripthost.com" : {
+            "script" : path.join(fixturesDir,"scripthost.js")
         }
     },
     "default_host" : {
@@ -27,16 +30,16 @@ exports.settings = {
 
 /* Testing helper functions */
 
-/** Make an HTTP req (given parameters in req), and test the response
+/** Fires an HTTP request, and test that the response is what we expect
+ *
  * test: The nodeunit test object
  *
  * req.method:  HTTP request method
  * req.headers: HTTP request headers
  * req.pathname: HTTP Request resource
  * 
- * expected_res represents the expected HTTP Response.
- * expected_res.statusCode
- * expected_res.body
+ * expected_res.statusCode: The expected response code
+ * expected_res.body: The expected HTTP response body
  * Leave any of these values undefined, and they won't be tested
  */
 exports.test_http = function(test, req, expected_res, callback) {
