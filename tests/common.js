@@ -18,7 +18,7 @@ exports.settings = {
             "root" : path.join(fixturesDir,"examplevirtualhost.com")
         },
         "scripthost.com" : {
-            "script" : path.join(fixturesDir,"scripthost.js")
+            "handler" : path.join(fixturesDir,"scripthost.js")
         }
     },
     "default_host" : {
