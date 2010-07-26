@@ -26,6 +26,7 @@ exports.settings = {
     },
     "log_level": antinode.log_levels.ERROR
 };
+settings.request_preprocessor = require('./fixtures/redirector').preprocessor;
 
 
 /* Testing helper functions */
@@ -40,6 +41,7 @@ exports.settings = {
  * 
  * expected_res.statusCode: The expected response code
  * expected_res.body: The expected HTTP response body
+ * expected_res.headers: The expected HTTP response headers (only test the ones specified)
  * Leave any of these values undefined, and they won't be tested
  */
 exports.test_http = function(test, req, expected_res, callback) {
@@ -48,6 +50,15 @@ exports.test_http = function(test, req, expected_res, callback) {
     r.addListener('response',function(response){
         if (expected_res.statusCode) {
             test.equals(response.statusCode, expected_res.statusCode);
+        }
+        if (expected_res.headers) {
+            for (var name in expected_res.headers) {
+                if (expected_res.headers.hasOwnProperty(name)) {
+                    var expected_header = expected_res.headers[name];
+                    var actual_header = response.headers[name];
+                    test.equals(expected_header, actual_header);
+                }
+            }
         }
         if (expected_res.body) {
             response.setEncoding('binary');
