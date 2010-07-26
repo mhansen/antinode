@@ -1,6 +1,6 @@
 require('./common');
 
-var files = ["smalltext", "dictionary", "cat.jpg"];
+var files = ["smalltext", "dictionary", "cat.jpg", "oranga_thumb.jpg"];
 
 files.forEach(function (file) {
     var disc_filename = path.join(settings.default_host.root, file);
