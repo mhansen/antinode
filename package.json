@@ -19,7 +19,7 @@
 , "directories" : { "lib" : "./lib/" }
 , "main" : "./lib/antinode"
 , "bin" : { "antinode" : "./server.js" }
-, "engines" : { "node" : ">=0.1.97" }
+, "engines" : { "node" : ">=0.1.100" }
 , "licenses" :
   [ { "type" : "MIT"
     , "url" : "http://github.com/mhansen/antinode/raw/master/LICENSE"
