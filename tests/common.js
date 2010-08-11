@@ -24,7 +24,8 @@ exports.settings = {
     "default_host" : {
         "root": path.join(fixturesDir,"default-host")
     },
-    "log_level": antinode.log_levels.ERROR
+    /* turn this up to 'log_levels.DEBUG' when debugging failing tests */
+    "log_level": antinode.log_levels.ERROR 
 };
 settings.request_preprocessor = require('./fixtures/redirector').preprocessor;
 
