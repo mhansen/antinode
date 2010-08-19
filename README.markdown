@@ -29,7 +29,8 @@ Example settings file:
             },
         "default_host" : {
             "root" : "/www/default/"
-        }
+        },
+		"index_files" : [ "index.xhtml", "index.html" ]
     }
 
 This server listens on port 8080 for HTTP requests.
@@ -44,6 +45,7 @@ Explanation of properties:
 - `port` - the port to listen for HTTP connections on. default: 8080
 - `hosts` - an object with one property name per virtual host address, with the value of a 'virtual host' object to 
 - `default_host` - the 'virtual host' object to default to if no other virtual hosts match, or the HTTP `Host` header is not given
+- `index_files` - if the request’s url is a directory, return the first index file from this list that has been found in the directory (if none was found, lists the directory).
 
 'virtual host object' - has a property `root` giving the directory to serve
    web requests from
@@ -59,7 +61,8 @@ E.g. an HTTP request for `/styles/site.css` will will look for the file `/var/ww
 - HTTP `Date` header
 - HTTP `Last-Modified` header
 - Reads files in binary mode - so can serve images and other binary files (not just text)
-- Requests to any `directory` try to return `directory/index.html`
+- Requests to any `directory` try to return an index file (from the settings)
+- Directory listing
 - Virtual Hosts
 
 # Test Suite
