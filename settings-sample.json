@@ -15,6 +15,7 @@
 
     "default_host" : {
         "root" : "/home/Moon/www/default/"
-    }
+    },
 
+	"index_files" : [ "index.xhtml", "index.html" ]
 }
